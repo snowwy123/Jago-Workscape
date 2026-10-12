@@ -1,0 +1,7 @@
+// SPDX-License-Identifier: MIT
+using System;using System.IO;using System.Drawing;using System.Linq;using System.Windows.Forms;using System.Collections.Generic;
+sealed partial class WorkspaceWindow {
+ Control BrandControl(Control parent){if(Convert.ToString(parent.Tag)=="suite-logo")return parent;foreach(Control child in parent.Controls){var found=BrandControl(child);if(found!=null)return found;}return null;}
+ void BrandingTest(){var checks=new List<string>();try{timer.Stop();if(Text!="Jago Workscape")throw new Exception("Public title differs");checks.Add("Workscape title and launcher name");var logo=BrandControl(home) as PictureBox;if(logo==null||logo.Image==null||logo.Image.Width!=1184||logo.Image.Height!=592)throw new Exception("Approved logo is missing");checks.Add("Approved logo is embedded at original resolution");foreach(string theme in new[]{"Sketchbook","Charcoal","Paper","Plum","Candy","Forest","Blueprint"}){ApplyAppearance(theme,false);if(logo.BackColor!=BackColor)throw new Exception("Logo loses contrast: "+theme);using(var image=new Bitmap(Width,Height)){DrawToBitmap(image,new Rectangle(0,0,Width,Height));image.Save(Path.Combine(WorkspaceProgram.Test,theme+".png"));}checks.Add("Approved logo remains readable in "+theme);}Atomic(Path.Combine(WorkspaceProgram.Test,"result.json"),json.Serialize(new{ok=true,checks}));}catch(Exception e){Atomic(Path.Combine(WorkspaceProgram.Test,"result.json"),json.Serialize(new{ok=false,error=e.ToString(),checks}));}allowClose=true;Close();}
+}
+
